@@ -4,6 +4,9 @@ WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
+# Debug step to check target folder contents
+RUN ls -l /app/target
+
 # ---- Run Stage ----
 FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
