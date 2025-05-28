@@ -1,24 +1,23 @@
-# -------- Build stage --------
+# Stage 1: Build the jar
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+
 WORKDIR /app
 
-# Copy pom and source files
-COPY . .
+COPY pom.xml .
+COPY src ./src
 
-# Build the project and print output to verify
-RUN mvn clean package -DskipTests && \
-    echo "==== JAR FILES ====" && \
-    ls -lh target
+RUN mvn clean package -DskipTests
 
-# -------- Runtime stage --------
+# Stage 2: Run the jar
 FROM eclipse-temurin:21-jdk-alpine
+
 WORKDIR /app
 
-# Copy the built jar (match your artifactId and version from pom.xml)
+# Copy the jar from the build stage (adjust name if needed)
 COPY --from=build /app/target/tracking-number-service-0.0.1-SNAPSHOT.jar app.jar
 
-# Optional: Verify it exists
-RUN ls -lh /app
+# Expose the port your app runs on (default for Spring Boot WebFlux is 8080)
+EXPOSE 8080
 
-# Run the app
+# Run the jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
